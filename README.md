@@ -17,7 +17,3 @@ All of the timings are in seconds.
 
 [Vesting test](tests/vesting.ts) will deploy [MockTimelock.sol](contracts/MockTimelock.sol)
 instead of the timelock contract to have control over `block.timestamp`
-
-# License
-
-AGPL-3.0
