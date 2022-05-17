@@ -32,6 +32,20 @@ describe('Vesting test', async () => {
         await (await userConnection.transfer(burnAddress(), userBalance)).wait()
     })
 
+    it('should not init if edge < now', async () => {
+        try {
+            await initVesting(token, owner, user, amount, 1, -2)
+            expect(false, 'edge before now').to.be.true
+        } catch {}
+    })
+
+    it('should not init if edge > end', async () => {
+        try {
+            await initVesting(token, owner, user, amount, 1, 0, 2)
+            expect(false, 'edge after end').to.be.true
+        } catch {}
+    })
+
     it('should not withdraw before edge', async () => {
         let { vesting, now, cliffAmount } = await initVesting(
             token,

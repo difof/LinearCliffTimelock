@@ -70,12 +70,13 @@ export async function initVesting(
     owner: SignerWithAddress,
     user: SignerWithAddress,
     amount: BigNumber,
-    cliffDuration: number
+    cliffDuration: number,
+    cliffStartModifier: number = 0,
+    cliffPeriod = 1
 ): Promise<{ vesting: Contract; now: number; cliffAmount: BigNumber }> {
     let now = getnow()
-    let cliffStart = now
+    let cliffStart = now + cliffStartModifier
     let cliffEnd = cliffStart + cliffDuration
-    let cliffPeriod = 1
 
     let { vesting } = await deployVesting(
         token,
