@@ -15,6 +15,7 @@ const config: HardhatUserConfig = {
     },
     networks: {
         hardhat: {
+            gasPrice: 60000000000,
             mining: {
                 auto: true
                 // interval: 1000
