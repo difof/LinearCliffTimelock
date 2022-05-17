@@ -32,6 +32,25 @@ describe('Vesting test', async () => {
         await (await userConnection.transfer(burnAddress(), userBalance)).wait()
     })
 
+    it('should not withdraw before edge', async () => {
+        let { vesting, now, cliffAmount } = await initVesting(
+            token,
+            owner,
+            user,
+            amount,
+            1
+        )
+
+        try {
+            await testWithdraw(vesting, now++, cliffAmount)
+            expect(false, 'withdrawn before edge').to.be.true
+        } catch {}
+
+        await testWithdraw(vesting, now, cliffAmount)
+
+        await checkBalance(token, user, amount)
+    })
+
     it('should withdraw in order', async () => {
         let { vesting, now, cliffAmount } = await initVesting(
             token,
@@ -65,9 +84,10 @@ describe('Vesting test', async () => {
         await testWithdraw(vesting, now++, cliffAmount, false)
         await testWithdraw(vesting, now++, cliffAmount, false)
 
+        // fail to withdraw if all is withdrawn
         try {
             await testWithdraw(vesting, now++, cliffAmount, false)
-            expect(false, 'MUST FAIL').to.be.true
+            expect(false, 'withdrawn after end').to.be.true
         } catch {}
 
         await checkBalance(token, user, amount)
