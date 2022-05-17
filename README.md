@@ -4,6 +4,12 @@ Lock any ERC20, release in periods!
 
 ## Usage
 
+Just
+
+`yarn install && yarn test`
+
+## Deploy
+
 Deploy the [LinearCliffTimelock.sol](contracts/LinearCliffTimelock.sol)
 
 Approve the contract for the amount you want to lock.
