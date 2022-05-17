@@ -6,6 +6,10 @@ import { expect } from 'chai'
 
 const getnow = () => Math.trunc(Date.now() / 1000)
 
+function burnAddress(): string {
+    return `0x${'f'.repeat(40)}`
+}
+
 async function checkBalance(
     token: Contract,
     user: SignerWithAddress,
@@ -125,6 +129,12 @@ describe('Vesting test', async () => {
         let tokenFactory = await ethers.getContractFactory('NewToken', owner)
         let tokenDeploy = await tokenFactory.deploy(parseEther('1000000'))
         token = await tokenDeploy.deployed()
+    })
+
+    afterEach(async () => {
+        let userConnection = token.connect(user)
+        let userBalance = await userConnection.balanceOf(user.address)
+        await (await userConnection.transfer(burnAddress(), userBalance)).wait()
     })
 
     it('should withdraw in order', async () => {
