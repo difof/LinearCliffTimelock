@@ -100,14 +100,14 @@ export async function testWithdraw(
     vesting: Contract,
     now: number,
     cliffAmount: BigNumber,
-    check = true
+    checkWithdrawAmount = true
 ): Promise<BigNumber> {
     await (await vesting.setNow(Math.trunc(now))).wait()
 
     let tx = (await (await vesting.withdraw()).wait()) as ContractReceipt
     const init = tx.events?.find((event) => event.event! === 'OnWithdraw')!
 
-    if (check) {
+    if (checkWithdrawAmount) {
         expect(
             init.args?.amount == cliffAmount.toString(),
             'correct withdraw amount'
