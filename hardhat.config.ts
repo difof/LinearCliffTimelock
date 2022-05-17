@@ -4,6 +4,9 @@ import '@nomiclabs/hardhat-waffle'
 import '@typechain/hardhat'
 import 'hardhat-gas-reporter'
 import 'solidity-coverage'
+import 'dotenv/config'
+
+const gasPrice = 60000000000
 
 const config: HardhatUserConfig = {
     solidity: {
@@ -15,7 +18,7 @@ const config: HardhatUserConfig = {
     },
     networks: {
         hardhat: {
-            gasPrice: 60000000000,
+            gasPrice,
             mining: {
                 auto: true
                 // interval: 1000
@@ -31,6 +34,13 @@ const config: HardhatUserConfig = {
     mocha: {
         timeout: 60000,
         bail: true
+    },
+    gasReporter: {
+        currency: 'USD',
+        coinmarketcap: process.env.CMC_API_KEY,
+        gasPriceApi:
+            'https://api.polygonscan.com/api?module=proxy&action=eth_gasPrice',
+        token: 'MATIC'
     }
 }
 
