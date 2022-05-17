@@ -1,10 +1,24 @@
 import { ethers } from 'hardhat'
 import { BigNumber, Contract, ContractReceipt } from 'ethers'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
-import { parseEther } from 'ethers/lib/utils'
+import { formatEther, parseEther } from 'ethers/lib/utils'
 import { expect } from 'chai'
 
 const getnow = () => Math.trunc(Date.now() / 1000)
+
+async function checkBalance(
+    token: Contract,
+    user: SignerWithAddress,
+    expectedBalance: BigNumber
+) {
+    let userbalance = await token.balanceOf(user.address)
+    expect(
+        userbalance.eq(expectedBalance),
+        `user balance ${formatEther(userbalance)} != ${formatEther(
+            expectedBalance
+        )}`
+    ).to.be.true
+}
 
 async function deployVesting(
     token: Contract,
@@ -129,8 +143,7 @@ describe('Vesting test', async () => {
         await testWithdraw(vesting, now++, cliffAmount)
         await testWithdraw(vesting, now++, cliffAmount)
 
-        let userbalance = await token.balanceOf(user.address)
-        expect(userbalance.eq(amount), 'correct balance').to.be.true
+        await checkBalance(token, user, amount)
     })
 
     it('should withdraw skipping', async () => {
@@ -152,8 +165,6 @@ describe('Vesting test', async () => {
             expect(false, 'MUST FAIL').to.be.true
         } catch {}
 
-        let userbalance = await token.balanceOf(user.address)
-        expect(userbalance.div(BigNumber.from(2)).eq(amount), 'correct balance')
-            .to.be.true
+        await checkBalance(token, user, amount)
     })
 })
