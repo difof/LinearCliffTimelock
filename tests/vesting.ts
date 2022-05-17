@@ -45,27 +45,6 @@ async function deployVesting(
     }
 }
 
-async function testWithdraw(
-    vesting: Contract,
-    now: number,
-    cliffAmount: BigNumber,
-    check = true
-): Promise<BigNumber> {
-    await (await vesting.setNow(Math.trunc(now))).wait()
-
-    let tx = (await (await vesting.withdraw()).wait()) as ContractReceipt
-    const init = tx.events?.find((event) => event.event! === 'OnWithdraw')!
-
-    if (check) {
-        expect(
-            init.args?.amount == cliffAmount.toString(),
-            'correct withdraw amount'
-        ).to.be.true
-    }
-
-    return init.args?.amount
-}
-
 async function initVesting(
     token: Contract,
     owner: SignerWithAddress,
@@ -95,6 +74,27 @@ async function initVesting(
     let cliffAmount = amount.div(BigNumber.from(availableCliffs))
 
     return { vesting, now, cliffAmount }
+}
+
+async function testWithdraw(
+    vesting: Contract,
+    now: number,
+    cliffAmount: BigNumber,
+    check = true
+): Promise<BigNumber> {
+    await (await vesting.setNow(Math.trunc(now))).wait()
+
+    let tx = (await (await vesting.withdraw()).wait()) as ContractReceipt
+    const init = tx.events?.find((event) => event.event! === 'OnWithdraw')!
+
+    if (check) {
+        expect(
+            init.args?.amount == cliffAmount.toString(),
+            'correct withdraw amount'
+        ).to.be.true
+    }
+
+    return init.args?.amount
 }
 
 describe('Vesting test', async () => {
