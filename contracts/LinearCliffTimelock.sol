@@ -90,7 +90,6 @@ contract LinearCliffTimelock is ReentrancyGuard {
         require(msg.sender == beneficiary, ERROR_ONLY_BENEFICIARY);
 
         uint256 _now = _getNow();
-        require(_now >= cliffEdge, ERROR_NOT_YET);
 
         if (_now >= cliffEnd) {
             uint256 _balance = token.balanceOf(address(this));
@@ -102,6 +101,8 @@ contract LinearCliffTimelock is ReentrancyGuard {
 
             return;
         }
+
+        require(_now >= cliffEdge, ERROR_NOT_YET);
 
         uint256 numCliffs = (cliffEnd - cliffStart) / cliffTimePeriod;
         uint256 cliffAmount = totalLocked / numCliffs;
