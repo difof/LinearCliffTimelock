@@ -20,7 +20,7 @@ async function checkBalance(
         userbalance.eq(expectedBalance),
         `user balance ${formatEther(userbalance)} != ${formatEther(
             expectedBalance
-        )}`
+        )} (expected)`
     ).to.be.true
 }
 
@@ -174,6 +174,22 @@ describe('Vesting test', async () => {
             await testWithdraw(vesting, now++, cliffAmount, false)
             expect(false, 'MUST FAIL').to.be.true
         } catch {}
+
+        await checkBalance(token, user, amount)
+    })
+
+    it('should withdraw past end', async () => {
+        let { vesting, now, cliffAmount } = await initVesting(
+            token,
+            owner,
+            user,
+            amount,
+            2
+        )
+
+        now += 2
+
+        await testWithdraw(vesting, now, cliffAmount, false)
 
         await checkBalance(token, user, amount)
     })
