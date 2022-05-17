@@ -8,7 +8,7 @@ Just
 
 `yarn install && yarn test`
 
-## Deploy
+### Deploy
 
 Deploy the [LinearCliffTimelock.sol](contracts/LinearCliffTimelock.sol)
 
@@ -17,7 +17,7 @@ Approve the contract for the amount you want to lock.
 Call [initialize](contracts/LinearCliffTimelock.sol#L49) to setup the vesting.
 It will transfer given amount from `msg.sender` to vesting contract.
 
-### Notes
+## Notes
 
 All of the timings are in seconds.
 
