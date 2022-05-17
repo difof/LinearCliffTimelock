@@ -19,6 +19,7 @@ contract LinearCliffTimelock is ReentrancyGuard {
         'ERROR_CLIFFEND_LTE_CLIFFSTART';
     string private constant ERROR_NOT_YET = 'ERROR_NOT_YET';
     string private constant ERROR_EMPTY = 'ERROR_EMPTY';
+    string private constant ERROR_INVALID_PERIOD = 'ERROR_INVALID_PERIOD';
 
     event OnInitialized(
         address indexed beneficiary,
@@ -59,6 +60,10 @@ contract LinearCliffTimelock is ReentrancyGuard {
 
         require(_cliffStart >= _getNow(), ERROR_CLIFFSTART_LT_NOW);
         require(_cliffEnd > _cliffStart, ERROR_CLIFFEND_LTE_CLIFFSTART);
+        require(
+            _cliffStart + _cliffTimePeriod <= _cliffEnd,
+            ERROR_INVALID_PERIOD
+        );
 
         _token.transferFrom(_sender, address(this), _amount);
 
