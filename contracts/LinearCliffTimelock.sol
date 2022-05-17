@@ -101,12 +101,12 @@ contract LinearCliffTimelock is ReentrancyGuard {
 
         uint256 numCliffs = (cliffEnd - cliffStart) / cliffTimePeriod;
         uint256 cliffAmount = totalLocked / numCliffs;
-        uint256 availableCliffs = ((_now - cliffEdge) / cliffTimePeriod) + 1;
-        uint256 amount = availableCliffs * cliffAmount;
+        uint256 numPastCliffs = ((_now - cliffEdge) / cliffTimePeriod) + 1;
+        uint256 amount = numPastCliffs * cliffAmount;
 
         token.transfer(beneficiary, amount);
 
-        cliffEdge += availableCliffs * cliffTimePeriod;
+        cliffEdge += numPastCliffs * cliffTimePeriod;
 
         emit OnWithdraw(amount, cliffEdge);
     }
