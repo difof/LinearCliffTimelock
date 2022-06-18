@@ -33,17 +33,17 @@ describe('Vesting test', async () => {
     })
 
     it('should not init if edge < now', async () => {
-        try {
-            await initVesting(token, owner, user, amount, 1, -2)
-            expect(false, 'edge before now').to.be.true
-        } catch {}
+        await expect(
+            initVesting(token, owner, user, amount, 1, -2),
+            'edge before now'
+        ).to.be.reverted
     })
 
     it('should not init if edge > end', async () => {
-        try {
-            await initVesting(token, owner, user, amount, 1, 0, 2)
-            expect(false, 'edge after end').to.be.true
-        } catch {}
+        await expect(
+            initVesting(token, owner, user, amount, 1, 0, 2),
+            'edge after end'
+        ).to.be.reverted
     })
 
     it('should not withdraw before edge', async () => {
@@ -55,10 +55,10 @@ describe('Vesting test', async () => {
             1
         )
 
-        try {
-            await testWithdraw(vesting, now++, cliffAmount)
-            expect(false, 'withdrawn before edge').to.be.true
-        } catch {}
+        await expect(
+            testWithdraw(vesting, now++, cliffAmount),
+            'withdrawn before edge'
+        ).to.be.reverted
 
         await testWithdraw(vesting, now, cliffAmount)
 
@@ -99,10 +99,10 @@ describe('Vesting test', async () => {
         await testWithdraw(vesting, now++, cliffAmount, false)
 
         // fail to withdraw if all is withdrawn
-        try {
-            await testWithdraw(vesting, now++, cliffAmount, false)
-            expect(false, 'withdrawn after end').to.be.true
-        } catch {}
+        await expect(
+            testWithdraw(vesting, now++, cliffAmount, false),
+            'withdrawn after end'
+        ).to.be.reverted
 
         await checkBalance(token, user, amount)
     })

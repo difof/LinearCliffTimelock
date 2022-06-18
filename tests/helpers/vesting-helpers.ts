@@ -18,12 +18,13 @@ export async function checkBalance(
     expectedBalance: BigNumber
 ) {
     let userbalance = await token.balanceOf(user.address)
+
     expect(
-        userbalance.eq(expectedBalance),
+        userbalance,
         `user balance ${formatEther(userbalance)} != ${formatEther(
             expectedBalance
         )} (expected)`
-    ).to.be.true
+    ).to.equal(expectedBalance)
 }
 
 export async function deployVesting(
@@ -89,7 +90,7 @@ export async function initVesting(
         now
     )
 
-    expect(amount.eq(await vesting.balance()), 'vesting balance').to.be.true
+    expect(await vesting.balance(), 'vesting balance').to.equal(amount)
 
     let availableCliffs = (cliffEnd - cliffStart) / cliffPeriod
     let cliffAmount = amount.div(BigNumber.from(availableCliffs))
@@ -109,10 +110,9 @@ export async function testWithdraw(
     const init = tx.events?.find((event) => event.event! === 'OnWithdraw')!
 
     if (checkWithdrawAmount) {
-        expect(
-            init.args?.amount == cliffAmount.toString(),
-            'correct withdraw amount'
-        ).to.be.true
+        expect(init.args?.amount, 'correct withdraw amount').to.equal(
+            cliffAmount
+        )
     }
 
     return init.args?.amount
