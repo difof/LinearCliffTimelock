@@ -43,7 +43,6 @@ contract LinearCliffTimelock is
 
     bool public initialized;
     uint256 public cliffAmount; // amount to be released at each cliff
-    uint256 public numCliffs; // total number of cliffs
 
     modifier mustBeInitialized() {
         require(initialized, ERROR_NOT_INITIALIZED);
@@ -84,7 +83,7 @@ contract LinearCliffTimelock is
         cliffEnd = _cliffEnd;
         cliffTimePeriod = _cliffTimePeriod;
 
-        numCliffs = (cliffEnd - cliffStart) / cliffTimePeriod;
+        uint256 numCliffs = (cliffEnd - cliffStart) / cliffTimePeriod;
         cliffAmount = totalLocked / numCliffs;
 
         initialized = true;
