@@ -59,7 +59,7 @@ contract LinearCliffTimelock is ReentrancyGuard, AccessControl, TimeContext {
         uint256 _cliffStart,
         uint256 _cliffEnd,
         uint256 _cliffTimePeriod
-    ) public virtual nonReentrant {
+    ) public virtual nonReentrant onlyRole(DEFAULT_ADMIN_ROLE) {
         require(!initialized, ERROR_ALREADY_INITIALIZED);
 
         uint256 edge = _cliffStart + _cliffTimePeriod;
