@@ -4,10 +4,14 @@ pragma solidity ^0.8.14;
 
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
-import '@openzeppelin/contracts/access/AccessControl.sol';
+import '@openzeppelin/contracts/access/AccessControlEnumerable.sol';
 import './TimeContext.sol';
 
-contract LinearCliffTimelock is ReentrancyGuard, AccessControl, TimeContext {
+contract LinearCliffTimelock is
+    ReentrancyGuard,
+    AccessControlEnumerable,
+    TimeContext
+{
     string private constant ERROR_ALREADY_INITIALIZED =
         'ERROR_ALREADY_INITIALIZED';
     string private constant ERROR_NOT_INITIALIZED = 'ERROR_NOT_INITIALIZED';
