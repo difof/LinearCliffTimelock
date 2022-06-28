@@ -46,7 +46,7 @@ export async function deployVesting(
 
     await (await token.approve(vesting.address, amount)).wait()
 
-    await (await vesting.setNow(Math.trunc(mockNow))).wait()
+    await (await vesting.setBlockTimestamp(Math.trunc(mockNow))).wait()
 
     let tx = await (
         await vesting.initialize(
@@ -104,7 +104,7 @@ export async function testWithdraw(
     cliffAmount: BigNumber,
     checkWithdrawAmount = true
 ): Promise<BigNumber> {
-    await (await vesting.setNow(Math.trunc(now))).wait()
+    await (await vesting.setBlockTimestamp(Math.trunc(now))).wait()
 
     let tx = (await (await vesting.withdraw()).wait()) as ContractReceipt
     const init = tx.events?.find((event) => event.event! === 'OnWithdraw')!

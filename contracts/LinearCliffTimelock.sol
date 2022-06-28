@@ -1,16 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-pragma solidity ^0.8.4;
+
+pragma solidity ^0.8.14;
 
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
+import '@openzeppelin/contracts/access/AccessControl.sol';
+import './TimeContext.sol';
 
-// LinearCliffTimelock
-// @notice Locks ERC20 tokens for specified duration.
-// @notice Tokens will be released on predefined periods, withdrawable from first cliff edge, not cliff start.
-// @notice After deploy, contract must have allowance to transfer tokens to itself.
-// @notice Once approved, call {initialize} function to setup the vesting.
-contract LinearCliffTimelock is ReentrancyGuard {
-    string private constant ERROR_ONLY_BENEFICIARY = 'ERROR_ONLY_BENEFICIARY';
+contract LinearCliffTimelock is ReentrancyGuard, AccessControl, TimeContext {
     string private constant ERROR_ALREADY_INITIALIZED =
         'ERROR_ALREADY_INITIALIZED';
     string private constant ERROR_NOT_INITIALIZED = 'ERROR_NOT_INITIALIZED';
@@ -18,6 +15,8 @@ contract LinearCliffTimelock is ReentrancyGuard {
     string private constant ERROR_EMPTY = 'ERROR_EMPTY';
     string private constant ERROR_EDGE_BT_END = 'ERROR_EDGE_BT_END';
     string private constant ERROR_EDGE_LT_NOW = 'ERROR_EDGE_LT_NOW';
+
+    bytes32 public constant ROLE_WITHDRAW = keccak256('ROLE_WITHDRAW');
 
     event OnInitialized(
         address indexed beneficiary,
@@ -36,11 +35,18 @@ contract LinearCliffTimelock is ReentrancyGuard {
     uint256 public cliffTimePeriod; // number of seconds for each cliff
     uint256 public cliffEdge; // timestamp of next cliff release in seconds
     uint256 public cliffEnd; // timestamp of lock end in seconds
+
     bool public initialized;
+    uint256 public cliffAmount; // amount to be released at each cliff
+    uint256 public numCliffs; // total number of cliffs
 
     modifier mustBeInitialized() {
         require(initialized, ERROR_NOT_INITIALIZED);
         _;
+    }
+
+    constructor() {
+        _grantRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 
     // initialize
@@ -53,14 +59,16 @@ contract LinearCliffTimelock is ReentrancyGuard {
         uint256 _cliffStart,
         uint256 _cliffEnd,
         uint256 _cliffTimePeriod
-    ) public nonReentrant {
+    ) public virtual nonReentrant {
         require(!initialized, ERROR_ALREADY_INITIALIZED);
 
         uint256 edge = _cliffStart + _cliffTimePeriod;
-        require(edge >= _getNow(), ERROR_EDGE_LT_NOW);
+        require(edge >= _blockTimestamp(), ERROR_EDGE_LT_NOW);
         require(edge <= _cliffEnd, ERROR_EDGE_BT_END);
 
         _token.transferFrom(_sender, address(this), _amount);
+
+        _grantRole(ROLE_WITHDRAW, _beneficiary);
 
         beneficiary = _beneficiary;
         token = _token;
@@ -69,6 +77,10 @@ contract LinearCliffTimelock is ReentrancyGuard {
         cliffEdge = edge;
         cliffEnd = _cliffEnd;
         cliffTimePeriod = _cliffTimePeriod;
+
+        numCliffs = (cliffEnd - cliffStart) / cliffTimePeriod;
+        cliffAmount = totalLocked / numCliffs;
+
         initialized = true;
 
         emit OnInitialized(
@@ -81,10 +93,14 @@ contract LinearCliffTimelock is ReentrancyGuard {
         );
     }
 
-    function withdraw() public nonReentrant mustBeInitialized {
-        require(msg.sender == beneficiary, ERROR_ONLY_BENEFICIARY);
-
-        uint256 _now = _getNow();
+    function withdraw()
+        public
+        virtual
+        onlyRole(ROLE_WITHDRAW)
+        nonReentrant
+        mustBeInitialized
+    {
+        uint256 _now = _blockTimestamp();
 
         if (_now >= cliffEnd) {
             uint256 _balance = token.balanceOf(address(this));
@@ -99,8 +115,6 @@ contract LinearCliffTimelock is ReentrancyGuard {
 
         require(_now >= cliffEdge, ERROR_NOT_YET);
 
-        uint256 numCliffs = (cliffEnd - cliffStart) / cliffTimePeriod;
-        uint256 cliffAmount = totalLocked / numCliffs;
         uint256 numPastCliffs = ((_now - cliffEdge) / cliffTimePeriod) + 1;
         uint256 amount = numPastCliffs * cliffAmount;
 
@@ -113,9 +127,5 @@ contract LinearCliffTimelock is ReentrancyGuard {
 
     function balance() public view mustBeInitialized returns (uint256) {
         return token.balanceOf(address(this));
-    }
-
-    function _getNow() internal view virtual returns (uint256) {
-        return block.timestamp;
     }
 }
