@@ -16,7 +16,8 @@ contract LinearCliffTimelock is ReentrancyGuard, AccessControl, TimeContext {
     string private constant ERROR_EDGE_BT_END = 'ERROR_EDGE_BT_END';
     string private constant ERROR_EDGE_LT_NOW = 'ERROR_EDGE_LT_NOW';
 
-    bytes32 public constant ROLE_WITHDRAW = keccak256('ROLE_WITHDRAW');
+    bytes32 private constant ROLE_INITIALIZE = keccak256('ROLE_INITIALIZE');
+    bytes32 private constant ROLE_WITHDRAW = keccak256('ROLE_WITHDRAW');
 
     event OnInitialized(
         address indexed beneficiary,
@@ -47,6 +48,7 @@ contract LinearCliffTimelock is ReentrancyGuard, AccessControl, TimeContext {
 
     constructor() {
         _grantRole(DEFAULT_ADMIN_ROLE, _msgSender());
+        _grantRole(ROLE_INITIALIZE, _msgSender());
     }
 
     // initialize
@@ -59,7 +61,7 @@ contract LinearCliffTimelock is ReentrancyGuard, AccessControl, TimeContext {
         uint256 _cliffStart,
         uint256 _cliffEnd,
         uint256 _cliffTimePeriod
-    ) public virtual nonReentrant onlyRole(DEFAULT_ADMIN_ROLE) {
+    ) public virtual nonReentrant onlyRole(ROLE_INITIALIZE) {
         require(!initialized, ERROR_ALREADY_INITIALIZED);
 
         uint256 edge = _cliffStart + _cliffTimePeriod;
