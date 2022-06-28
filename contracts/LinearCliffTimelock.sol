@@ -16,8 +16,8 @@ contract LinearCliffTimelock is ReentrancyGuard, AccessControl, TimeContext {
     string private constant ERROR_EDGE_BT_END = 'ERROR_EDGE_BT_END';
     string private constant ERROR_EDGE_LT_NOW = 'ERROR_EDGE_LT_NOW';
 
-    bytes32 private constant ROLE_INITIALIZE = keccak256('ROLE_INITIALIZE');
-    bytes32 private constant ROLE_WITHDRAW = keccak256('ROLE_WITHDRAW');
+    bytes32 private constant INITIALIZE_ROLE = keccak256('INITIALIZE_ROLE');
+    bytes32 private constant WITHDRAW_ROLE = keccak256('WITHDRAW_ROLE');
 
     event OnInitialized(
         address indexed beneficiary,
@@ -48,7 +48,7 @@ contract LinearCliffTimelock is ReentrancyGuard, AccessControl, TimeContext {
 
     constructor() {
         _grantRole(DEFAULT_ADMIN_ROLE, _msgSender());
-        _grantRole(ROLE_INITIALIZE, _msgSender());
+        _grantRole(INITIALIZE_ROLE, _msgSender());
     }
 
     // initialize
@@ -61,7 +61,7 @@ contract LinearCliffTimelock is ReentrancyGuard, AccessControl, TimeContext {
         uint256 _cliffStart,
         uint256 _cliffEnd,
         uint256 _cliffTimePeriod
-    ) public virtual nonReentrant onlyRole(ROLE_INITIALIZE) {
+    ) public virtual nonReentrant onlyRole(INITIALIZE_ROLE) {
         require(!initialized, ERROR_ALREADY_INITIALIZED);
 
         uint256 edge = _cliffStart + _cliffTimePeriod;
@@ -70,7 +70,7 @@ contract LinearCliffTimelock is ReentrancyGuard, AccessControl, TimeContext {
 
         _token.transferFrom(_sender, address(this), _amount);
 
-        _grantRole(ROLE_WITHDRAW, _beneficiary);
+        _grantRole(WITHDRAW_ROLE, _beneficiary);
 
         beneficiary = _beneficiary;
         token = _token;
@@ -98,7 +98,7 @@ contract LinearCliffTimelock is ReentrancyGuard, AccessControl, TimeContext {
     function withdraw()
         public
         virtual
-        onlyRole(ROLE_WITHDRAW)
+        onlyRole(WITHDRAW_ROLE)
         nonReentrant
         mustBeInitialized
     {
