@@ -10,12 +10,15 @@ Just
 
 ### Deploy
 
-Deploy the [LinearCliffTimelock.sol](contracts/LinearCliffTimelock.sol)
+Deploy the [LinearCliffTimelock.sol](contracts/LinearCliffTimelock.sol).
+
+**NOTE** The deployer will be granted `DEFAULT_ADMIN_ROLE` and `INITIALIZE_ROLE` so that only the admin can call initialize function.
 
 Approve the contract for the amount you want to lock.
 
 Call [initialize](contracts/LinearCliffTimelock.sol#L49) to setup the vesting.
-It will transfer given amount from `msg.sender` to vesting contract.
+It will transfer given amount from `_sender` to vesting contract.
+Anyone with `WITHDRAW_ROLE` can call [withdraw](contracts/LinearCliffTimelock.sol#L98) to transfer the claimable amount to the beneficiary.
 
 ## Notes
 
