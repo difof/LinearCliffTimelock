@@ -1,5 +1,4 @@
 import { ethers } from 'hardhat'
-import { Contract } from 'ethers'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { parseEther } from 'ethers/lib/utils'
 import { expect } from 'chai'
@@ -9,11 +8,12 @@ import {
     initVesting,
     testWithdraw
 } from './helpers/vesting-helpers'
+import { IERC20 } from '../typechain'
 
 describe('Vesting test', async () => {
     let owner: SignerWithAddress
     let user: SignerWithAddress
-    let token: Contract
+    let token: IERC20
     let amount = parseEther('200')
 
     before(async () => {
@@ -23,7 +23,7 @@ describe('Vesting test', async () => {
 
         let tokenFactory = await ethers.getContractFactory('NewToken', owner)
         let tokenDeploy = await tokenFactory.deploy(parseEther('1000000'))
-        token = await tokenDeploy.deployed()
+        token = (await tokenDeploy.deployed()) as IERC20
     })
 
     afterEach(async () => {

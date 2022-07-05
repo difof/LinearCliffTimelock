@@ -1,8 +1,9 @@
 import { ethers } from 'hardhat'
 import { BigNumber, Contract, ContractReceipt } from 'ethers'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
-import { formatEther, parseEther } from 'ethers/lib/utils'
+import { formatEther } from 'ethers/lib/utils'
 import { expect } from 'chai'
+import { IERC20, MockTimelock } from '../../typechain'
 
 export function getnow() {
     return Math.trunc(Date.now() / 1000)
@@ -13,7 +14,7 @@ export function burnAddress(): string {
 }
 
 export async function checkBalance(
-    token: Contract,
+    token: IERC20,
     user: SignerWithAddress,
     expectedBalance: BigNumber
 ) {
@@ -28,7 +29,7 @@ export async function checkBalance(
 }
 
 export async function deployVesting(
-    token: Contract,
+    token: IERC20,
     owner: SignerWithAddress,
     beneficiary: SignerWithAddress,
     amount: BigNumber,
@@ -36,13 +37,13 @@ export async function deployVesting(
     cliffEnd: number,
     cliffPeriod: number,
     mockNow: number = getnow()
-): Promise<{ vesting: Contract; tx: ContractReceipt }> {
+): Promise<{ vesting: MockTimelock; tx: ContractReceipt }> {
     let vestingFactory = await ethers.getContractFactory(
         'MockTimelock',
         beneficiary
     )
     let vestingDeploy = await vestingFactory.deploy()
-    let vesting = await vestingDeploy.deployed()
+    let vesting = (await vestingDeploy.deployed()) as MockTimelock
 
     await (await token.approve(vesting.address, amount)).wait()
 
@@ -67,14 +68,14 @@ export async function deployVesting(
 }
 
 export async function initVesting(
-    token: Contract,
+    token: IERC20,
     owner: SignerWithAddress,
     user: SignerWithAddress,
     amount: BigNumber,
     cliffDuration: number,
     cliffStartModifier: number = 0,
     cliffPeriod = 1
-): Promise<{ vesting: Contract; now: number; cliffAmount: BigNumber }> {
+): Promise<{ vesting: MockTimelock; now: number; cliffAmount: BigNumber }> {
     let now = getnow()
     let cliffStart = now + cliffStartModifier
     let cliffEnd = cliffStart + cliffDuration
@@ -99,7 +100,7 @@ export async function initVesting(
 }
 
 export async function testWithdraw(
-    vesting: Contract,
+    vesting: MockTimelock,
     now: number,
     cliffAmount: BigNumber,
     checkWithdrawAmount = true
