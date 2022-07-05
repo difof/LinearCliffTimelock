@@ -1,9 +1,22 @@
 import { ethers } from 'hardhat'
-import { BigNumber, Contract, ContractReceipt } from 'ethers'
+import {
+    BaseContract,
+    BigNumber,
+    Contract,
+    ContractReceipt,
+    ContractTransaction
+} from 'ethers'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { formatEther } from 'ethers/lib/utils'
 import { expect } from 'chai'
-import { IERC20, MockTimelock } from '../../typechain'
+import {
+    AccessControl,
+    IERC20,
+    MockTimeContext,
+    MockTimelock
+} from '../../typechain'
+
+const { formatBytes32String, keccak256, toUtf8Bytes } = ethers.utils
 
 export function getnow() {
     return Math.trunc(Date.now() / 1000)
@@ -11,6 +24,13 @@ export function getnow() {
 
 export function burnAddress(): string {
     return `0x${'f'.repeat(40)}`
+}
+
+// wait for transaction
+export async function wtx(
+    result: Promise<ContractTransaction>
+): Promise<ContractReceipt> {
+    return await (await result).wait()
 }
 
 export async function checkBalance(
@@ -45,12 +65,12 @@ export async function deployVesting(
     let vestingDeploy = await vestingFactory.deploy()
     let vesting = (await vestingDeploy.deployed()) as MockTimelock
 
-    await (await token.approve(vesting.address, amount)).wait()
+    await wtx(token.approve(vesting.address, amount))
 
-    await (await vesting.setBlockTimestamp(Math.trunc(mockNow))).wait()
+    await wtx(vesting.setBlockTimestamp(Math.trunc(mockNow)))
 
-    let tx = await (
-        await vesting.initialize(
+    let tx = await wtx(
+        vesting.initialize(
             token.address,
             amount,
             owner.address,
@@ -59,7 +79,7 @@ export async function deployVesting(
             Math.trunc(cliffEnd),
             Math.trunc(cliffPeriod)
         )
-    ).wait()
+    )
 
     return {
         vesting,
@@ -107,7 +127,7 @@ export async function testWithdraw(
 ): Promise<BigNumber> {
     await (await vesting.setBlockTimestamp(Math.trunc(now))).wait()
 
-    let tx = (await (await vesting.withdraw()).wait()) as ContractReceipt
+    let tx = (await wtx(vesting.withdraw())) as ContractReceipt
     const init = tx.events?.find((event) => event.event! === 'OnWithdraw')!
 
     if (checkWithdrawAmount) {
@@ -117,4 +137,37 @@ export async function testWithdraw(
     }
 
     return init.args?.amount
+}
+export interface Addressable {
+    address: string
+}
+
+export const DEFAULT_ADMIN_ROLE = formatBytes32String('')
+
+export const roleToBytes32 = (role) =>
+    role == 'DEFAULT_ADMIN_ROLE'
+        ? DEFAULT_ADMIN_ROLE
+        : keccak256(toUtf8Bytes(role))
+
+export const grantRole = async (
+    accessControl: AccessControl,
+    role: string,
+    signer: Addressable
+): Promise<ContractTransaction> =>
+    accessControl.grantRole(roleToBytes32(role), signer.address)
+
+export const revokeRole = async (
+    accessControl: AccessControl,
+    role: string,
+    signer: Addressable
+): Promise<ContractTransaction> =>
+    accessControl.revokeRole(roleToBytes32(role), signer.address)
+
+export async function setTimeContext(
+    mockTimeContext: BaseContract,
+    time: number,
+    block: number
+) {
+    await wtx((mockTimeContext as MockTimeContext).setBlockTimestamp(time))
+    await wtx((mockTimeContext as MockTimeContext).setBlockNumber(block))
 }
