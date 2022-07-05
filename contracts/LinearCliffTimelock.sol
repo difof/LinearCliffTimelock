@@ -136,7 +136,7 @@ contract LinearCliffTimelock is
         emit OnWithdraw(amount, cliffEdge);
     }
 
-    function balance() public view mustBeInitialized returns (uint256) {
+    function balance() external view mustBeInitialized returns (uint256) {
         return token.balanceOf(address(this));
     }
 }

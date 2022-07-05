@@ -27,4 +27,6 @@ interface ILinearCliffTimelock {
     ) external;
 
     function withdraw() external;
+
+    function balance() external view returns (uint256);
 }
