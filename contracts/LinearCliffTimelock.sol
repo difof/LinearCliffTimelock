@@ -5,9 +5,11 @@ pragma solidity ^0.8.14;
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import '@openzeppelin/contracts/access/AccessControlEnumerable.sol';
+import './ILinearCliffTimelock.sol';
 import './TimeContext.sol';
 
 contract LinearCliffTimelock is
+    ILinearCliffTimelock,
     ReentrancyGuard,
     AccessControlEnumerable,
     TimeContext
@@ -23,16 +25,6 @@ contract LinearCliffTimelock is
 
     bytes32 private constant INITIALIZE_ROLE = keccak256('INITIALIZE_ROLE');
     bytes32 private constant WITHDRAW_ROLE = keccak256('WITHDRAW_ROLE');
-
-    event OnInitialized(
-        address indexed beneficiary,
-        IERC20 indexed token,
-        uint256 indexed amount,
-        uint256 cliffStart,
-        uint256 cliffEnd,
-        uint256 cliffTimePeriod
-    );
-    event OnWithdraw(uint256 indexed amount, uint256 next);
 
     IERC20 public token;
     address public beneficiary;
@@ -78,7 +70,7 @@ contract LinearCliffTimelock is
         uint256 _cliffStart,
         uint256 _cliffEnd,
         uint256 _cliffTimePeriod
-    ) public virtual nonReentrant onlyRole(INITIALIZE_ROLE) {
+    ) external virtual nonReentrant onlyRole(INITIALIZE_ROLE) {
         require(!initialized, ERROR_ALREADY_INITIALIZED);
 
         uint256 edge = _cliffStart + _cliffTimePeriod;
@@ -103,8 +95,8 @@ contract LinearCliffTimelock is
         initialized = true;
 
         emit OnInitialized(
-            beneficiary,
             token,
+            beneficiary,
             totalLocked,
             cliffStart,
             cliffEnd,
@@ -113,7 +105,7 @@ contract LinearCliffTimelock is
     }
 
     function withdraw()
-        public
+        external
         virtual
         onlyRole(WITHDRAW_ROLE)
         nonReentrant
