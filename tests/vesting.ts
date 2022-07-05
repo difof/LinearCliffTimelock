@@ -11,7 +11,7 @@ import {
 } from './helpers/vesting-helpers'
 import { IERC20 } from '../typechain'
 
-const { parseEther, keccak256, toUtf8Bytes } = ethers.utils
+const { parseEther } = ethers.utils
 
 describe('Vesting test', async () => {
     let owner: SignerWithAddress
