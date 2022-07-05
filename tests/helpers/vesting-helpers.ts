@@ -164,10 +164,10 @@ export const revokeRole = async (
     accessControl.revokeRole(roleToBytes32(role), signer.address)
 
 export async function setTimeContext(
-    mockTimeContext: BaseContract,
+    mockTimeContext: MockTimeContext,
     time: number,
     block: number
 ) {
-    await wtx((mockTimeContext as MockTimeContext).setBlockTimestamp(time))
-    await wtx((mockTimeContext as MockTimeContext).setBlockNumber(block))
+    await wtx(mockTimeContext.setBlockTimestamp(time))
+    await wtx(mockTimeContext.setBlockNumber(block))
 }
