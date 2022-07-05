@@ -1,14 +1,17 @@
 import { ethers } from 'hardhat'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
-import { parseEther } from 'ethers/lib/utils'
 import { expect } from 'chai'
 import {
     burnAddress,
     checkBalance,
+    grantRole,
     initVesting,
+    revokeRole,
     testWithdraw
 } from './helpers/vesting-helpers'
 import { IERC20 } from '../typechain'
+
+const { parseEther, keccak256, toUtf8Bytes } = ethers.utils
 
 describe('Vesting test', async () => {
     let owner: SignerWithAddress
@@ -44,6 +47,29 @@ describe('Vesting test', async () => {
             initVesting(token, owner, user, amount, 1, 0, 2),
             'edge after end'
         ).to.be.reverted
+    })
+
+    it('should not revoke WITHDRAW_ROLE from beneficiary', async () => {
+        let { vesting } = await initVesting(token, owner, user, amount, 1)
+
+        await expect(
+            revokeRole(vesting, 'WITHDRAW_ROLE', user),
+            'revoke withdraw from beneficiary'
+        ).to.be.reverted
+    })
+
+    it('should revoke WITHDRAW_ROLE from owner', async () => {
+        let { vesting } = await initVesting(token, owner, user, amount, 1)
+
+        await expect(
+            grantRole(vesting, 'WITHDRAW_ROLE', owner),
+            'granting WITHDRAW_ROLE to owner'
+        ).to.not.be.reverted
+
+        await expect(
+            revokeRole(vesting, 'WITHDRAW_ROLE', owner),
+            'revoking WITHDRAW_ROLE from owner'
+        ).to.not.be.reverted
     })
 
     it('should not withdraw before edge', async () => {
