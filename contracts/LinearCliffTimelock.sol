@@ -19,6 +19,7 @@ contract LinearCliffTimelock is
     string private constant ERROR_EMPTY = 'ERROR_EMPTY';
     string private constant ERROR_EDGE_BT_END = 'ERROR_EDGE_BT_END';
     string private constant ERROR_EDGE_LT_NOW = 'ERROR_EDGE_LT_NOW';
+    string private constant ERROR_CANNOT_REVOKE = 'ERROR_CANNOT_REVOKE';
 
     bytes32 private constant INITIALIZE_ROLE = keccak256('INITIALIZE_ROLE');
     bytes32 private constant WITHDRAW_ROLE = keccak256('WITHDRAW_ROLE');
@@ -33,8 +34,8 @@ contract LinearCliffTimelock is
     );
     event OnWithdraw(uint256 indexed amount, uint256 next);
 
-    address public beneficiary;
     IERC20 public token;
+    address public beneficiary;
     uint256 public totalLocked;
     uint256 public cliffStart; // timestamp of lock start in seconds
     uint256 public cliffTimePeriod; // number of seconds for each cliff
@@ -52,6 +53,19 @@ contract LinearCliffTimelock is
     constructor() {
         _grantRole(DEFAULT_ADMIN_ROLE, _msgSender());
         _grantRole(INITIALIZE_ROLE, _msgSender());
+    }
+
+    function revokeRole(bytes32 role, address account)
+        public
+        virtual
+        override(IAccessControl, AccessControl)
+    {
+        // TODO: turn this into a require when sober
+        if (role == WITHDRAW_ROLE && account == beneficiary) {
+            revert(ERROR_CANNOT_REVOKE);
+        }
+
+        super.revokeRole(role, account);
     }
 
     // initialize
