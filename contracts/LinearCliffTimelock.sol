@@ -139,4 +139,15 @@ contract LinearCliffTimelock is
     function balance() external view mustBeInitialized returns (uint256) {
         return token.balanceOf(address(this));
     }
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(IERC165, AccessControlEnumerable)
+        returns (bool)
+    {
+        return
+            interfaceId == type(ILinearCliffTimelock).interfaceId ||
+            AccessControlEnumerable.supportsInterface(interfaceId);
+    }
 }
