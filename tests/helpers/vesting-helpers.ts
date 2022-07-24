@@ -127,7 +127,7 @@ export async function testWithdraw(
 ): Promise<BigNumber> {
     await (await vesting.setBlockTimestamp(Math.trunc(now))).wait()
 
-    let tx = (await wtx(vesting.withdraw())) as ContractReceipt
+    let tx = await wtx(vesting.withdraw())
     const init = tx.events?.find((event) => event.event! === 'OnWithdraw')!
 
     if (checkWithdrawAmount) {
@@ -144,7 +144,7 @@ export interface Addressable {
 
 export const DEFAULT_ADMIN_ROLE = formatBytes32String('')
 
-export const roleToBytes32 = (role) =>
+export const roleToBytes32 = (role: string) =>
     role == 'DEFAULT_ADMIN_ROLE'
         ? DEFAULT_ADMIN_ROLE
         : keccak256(toUtf8Bytes(role))
