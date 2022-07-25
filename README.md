@@ -4,9 +4,17 @@ Lock any ERC20, release in periods!
 
 ## Usage
 
+`npm install @difof/lct`
+
+Then import in Solidity:
+
+`import "@difof/lct/contracts/LinearCliffTimelock.sol"`
+
+## Build and test
+
 Just
 
-`yarn install && yarn test`
+`npm install && npm run test`
 
 ### Deploy
 
