@@ -1,12 +1,5 @@
 import { ethers } from 'hardhat'
-import {
-    BaseContract,
-    BigNumber,
-    Contract,
-    ContractReceipt,
-    ContractTransaction,
-    Signer
-} from 'ethers'
+import { BigNumber, ContractReceipt, ContractTransaction } from 'ethers'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { expect } from 'chai'
 import {

@@ -1,19 +1,9 @@
 import { ethers } from 'hardhat'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { expect } from 'chai'
+import { initVesting } from './helpers/vesting-helpers'
 import {
-    burnAddress,
-    checkBalance,
-    grantRole,
-    initVesting,
-    revokeRole,
-    testWithdraw,
-    wtx
-} from './helpers/vesting-helpers'
-import {
-    ERC20__factory,
     IERC20,
-    NewToken,
     NewToken__factory,
     TLPublicRegistry,
     TLPublicRegistry__factory
