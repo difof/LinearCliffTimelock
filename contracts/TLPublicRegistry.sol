@@ -3,7 +3,6 @@
 pragma solidity ^0.8.14;
 
 import '@openzeppelin/contracts/utils/introspection/IERC165.sol';
-import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import './ILinearCliffTimelock.sol';
 
 /**
