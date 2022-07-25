@@ -47,6 +47,10 @@ contract LinearCliffTimelock is
         _grantRole(INITIALIZE_ROLE, _msgSender());
     }
 
+    /**
+     * @dev Avoids revoking `WITHDRAW_ROLE` from the beneficiary
+     * @inheritdoc AccessControl
+     */
     function revokeRole(bytes32 role, address account)
         public
         virtual
@@ -60,8 +64,6 @@ contract LinearCliffTimelock is
         super.revokeRole(role, account);
     }
 
-    // initialize
-    // @dev Owner must approve this contract to spend given `_amount`
     function initialize(
         IERC20 _token,
         uint256 _amount,
