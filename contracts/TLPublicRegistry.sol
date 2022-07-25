@@ -11,11 +11,6 @@ import './ILinearCliffTimelock.sol';
  * @notice The registry is used for the frontend at "https://github.com/difof" for indexing timelocks.
  */
 contract TLPublicRegistry {
-    event OnTimelockAdded(
-        ILinearCliffTimelock indexed timelock,
-        address indexed beneficiary
-    );
-
     /// @dev List of beneficiary timelocks
     mapping(address => ILinearCliffTimelock[]) private _timelocks;
 
@@ -49,8 +44,6 @@ contract TLPublicRegistry {
 
         _timelocks[beneficiary].push(timelock);
         _timelockBeneficiary[timelock] = beneficiary;
-
-        emit OnTimelockAdded(timelock, beneficiary);
     }
 
     /**
