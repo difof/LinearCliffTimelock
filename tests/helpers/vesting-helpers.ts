@@ -4,19 +4,21 @@ import {
     BigNumber,
     Contract,
     ContractReceipt,
-    ContractTransaction
+    ContractTransaction,
+    Signer
 } from 'ethers'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
-import { formatEther } from 'ethers/lib/utils'
 import { expect } from 'chai'
 import {
     AccessControl,
     IERC20,
     MockTimeContext,
-    MockTimelock
+    MockTimelock,
+    MockTimelock__factory
 } from '../../typechain'
 
-const { formatBytes32String, keccak256, toUtf8Bytes } = ethers.utils
+const { formatBytes32String, keccak256, toUtf8Bytes, formatEther } =
+    ethers.utils
 
 export function getnow() {
     return Math.trunc(Date.now() / 1000)
@@ -58,12 +60,7 @@ export async function deployVesting(
     cliffPeriod: number,
     mockNow: number = getnow()
 ): Promise<{ vesting: MockTimelock; tx: ContractReceipt }> {
-    let vestingFactory = await ethers.getContractFactory(
-        'MockTimelock',
-        beneficiary
-    )
-    let vestingDeploy = await vestingFactory.deploy()
-    let vesting = (await vestingDeploy.deployed()) as MockTimelock
+    let vesting = await new MockTimelock__factory(beneficiary).deploy()
 
     await wtx(token.approve(vesting.address, amount))
 
