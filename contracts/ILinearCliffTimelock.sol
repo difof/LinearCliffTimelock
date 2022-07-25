@@ -6,7 +6,7 @@ import '@openzeppelin/contracts/utils/introspection/IERC165.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
 /**
- * @notice A modular timelock for vesting any ERC20 token.
+ * @notice A customizable timelock for vesting any ERC20 token.
  * @dev Once the timelock is deployed, contract must be approved to spend the amount of token on behalf on the sender.
  * @dev `initialize` function must be called by the `INITIALIZE_ROLE` role (or from deployer by default) to initialize the timelock.
  * @dev Anyone with `WITHDRAW_ROLE` can withdraw to the beneficiary.
