@@ -3,6 +3,7 @@
 pragma solidity ^0.8.14;
 
 import '@openzeppelin/contracts/utils/introspection/IERC165.sol';
+import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import './ILinearCliffTimelock.sol';
 
 contract TLPublicRegistry {
@@ -14,7 +15,7 @@ contract TLPublicRegistry {
     mapping(address => ILinearCliffTimelock[]) private _timelocks;
     mapping(ILinearCliffTimelock => address) private _timelockBeneficiary;
 
-    function addTimeLock(address beneficiary, ILinearCliffTimelock timelock)
+    function addTimelock(address beneficiary, ILinearCliffTimelock timelock)
         external
     {
         require(
@@ -32,16 +33,18 @@ contract TLPublicRegistry {
             'ERROR_BENEFICIARY_MISMATCH'
         );
 
+        require(timelock.balance() > 0, 'ERROR_NO_BALANCE');
+
         _timelocks[beneficiary].push(timelock);
         _timelockBeneficiary[timelock] = beneficiary;
 
         emit OnTimelockAdded(timelock, beneficiary);
     }
 
-    function getTimelocks(address beneficiary)
+    function timelocks(address beneficiary)
         external
         view
-        returns (ILinearCliffTimelock[] memory timelocks)
+        returns (ILinearCliffTimelock[] memory)
     {
         return _timelocks[beneficiary];
     }

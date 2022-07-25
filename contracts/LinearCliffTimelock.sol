@@ -114,7 +114,7 @@ contract LinearCliffTimelock is
         uint256 _now = _blockTimestamp();
 
         if (_now >= cliffEnd) {
-            uint256 _balance = token.balanceOf(address(this));
+            uint256 _balance = balance();
             require(_balance > 0, ERROR_EMPTY);
 
             token.transfer(beneficiary, _balance);
@@ -136,7 +136,7 @@ contract LinearCliffTimelock is
         emit OnWithdraw(amount, cliffEdge);
     }
 
-    function balance() external view mustBeInitialized returns (uint256) {
+    function balance() public view mustBeInitialized returns (uint256) {
         return token.balanceOf(address(this));
     }
 
