@@ -1,5 +1,5 @@
 {
-    "name": "linearclifftimelock",
+    "name": "@difof/lct",
     "version": "1.0.0",
     "author": "difof",
     "repository": "https://github.com/difof/LinearCliffTimelock",
@@ -10,11 +10,23 @@
         "clean": "rm -fr artifacts cache typechain",
         "test": "npx hardhat test --show-stack-traces --network hardhat tests/vesting.ts"
     },
-    "dependencies": {
+    "files": [
+        "/contracts/**/*.sol",
+        "/typechain/**/*.ts"
+    ],
+    "keywords": [
+        "solidity",
+        "ethereum",
+        "smart",
+        "contracts",
+        "vesting",
+        "timelock",
+        "erc20"
+    ],
+    "devDependencies": {
         "@nomiclabs/hardhat-ethers": "^2.0.5",
         "@nomiclabs/hardhat-etherscan": "^3.0.1",
         "@nomiclabs/hardhat-waffle": "^2.0.2",
-        "@openzeppelin/contracts": "^4.5.0",
         "@typechain/ethers-v5": "^7.2.0",
         "@typechain/hardhat": "^2.3.1",
         "@types/chai": "^4.3.0",
@@ -32,7 +44,6 @@
         "eslint-plugin-prettier": "^3.4.1",
         "eslint-plugin-promise": "^5.2.0",
         "ethereum-waffle": "^3.4.0",
-        "ethers": "^5.5.4",
         "hardhat": "^2.8.4",
         "hardhat-gas-reporter": "^1.0.7",
         "prettier": "^2.5.1",
@@ -42,5 +53,9 @@
         "ts-node": "^10.5.0",
         "typechain": "^5.2.0",
         "typescript": "^4.5.5"
+    },
+    "dependencies": {
+        "@openzeppelin/contracts": "^4.5.0",
+        "ethers": "^5.5.4"
     }
 }
