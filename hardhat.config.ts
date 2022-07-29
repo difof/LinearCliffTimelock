@@ -23,6 +23,18 @@ const config: HardhatUserConfig = {
                 auto: true
                 // interval: 1000
             }
+        },
+        polygon: {
+            url: `https://rpc-mainnet.matic.quiknode.pro`,
+            accounts: [process.env.PK]
+        },
+        ethereum: {
+            url: `https://cloudflare-eth.com`,
+            accounts: [process.env.PK]
+        },
+        bnb: {
+            url: `https://bsc-dataseed1.ninicoin.io`,
+            accounts: [process.env.PK]
         }
     },
     paths: {
@@ -39,8 +51,8 @@ const config: HardhatUserConfig = {
         currency: 'USD',
         coinmarketcap: process.env.CMC_API_KEY,
         gasPriceApi:
-            'https://api.polygonscan.com/api?module=proxy&action=eth_gasPrice',
-        token: 'MATIC'
+            'https://api.etherscan.com/api?module=proxy&action=eth_gasPrice',
+        token: 'ETH'
     }
 }
 
