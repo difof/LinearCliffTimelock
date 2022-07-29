@@ -4,3 +4,4 @@ cache
 coverage*
 .env
 typechain
+deploy_logs
