@@ -20,7 +20,7 @@ Just
 
 `yarn install && yarn test`
 
-### Deploy
+## Deploy
 
 1. Inherit and deploy the [LinearCliffTimelock.sol](contracts/LinearCliffTimelock.sol).
 
