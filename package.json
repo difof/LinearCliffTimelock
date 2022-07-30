@@ -12,6 +12,7 @@
         "test": "npx hardhat test --show-stack-traces --network hardhat tests/vesting.ts",
         "deploy:registry": "npx hardhat run scripts/deploy-registry.ts --network",
         "deploy:lct": "npx hardhat run scripts/deploy-lct.ts --network",
+        "deploy:token": "npx hardhat run scripts/deploy-token.ts --network",
         "verify": "npx hardhat verify --network",
         "local-node": "npx hardhat node"
     },

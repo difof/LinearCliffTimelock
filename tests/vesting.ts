@@ -9,7 +9,7 @@ import {
     revokeRole,
     testWithdraw
 } from './helpers/vesting-helpers'
-import { IERC20, NewToken__factory } from '../typechain'
+import { IERC20, ERC20Token__factory } from '../typechain'
 
 const { parseEther } = ethers.utils
 
@@ -24,7 +24,9 @@ describe('Vesting test', async () => {
         owner = signers[0]
         user = signers[1]
 
-        token = await new NewToken__factory(owner).deploy(parseEther('1000000'))
+        token = await new ERC20Token__factory(owner).deploy(
+            parseEther('1000000')
+        )
     })
 
     afterEach(async () => {
